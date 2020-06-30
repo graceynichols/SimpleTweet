@@ -2,6 +2,7 @@ package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +13,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>{
 
+    public static String TAG = "TweetsAdapter";
     Context context;
     List<Tweet> tweets;
 
@@ -71,6 +75,11 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView tvBody;
         TextView tvScreenName;
         TextView tvTime;
+        List<ImageView> imageViews;
+        ImageView image1;
+        ImageView image2;
+        ImageView image3;
+        ImageView image4;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -78,13 +87,53 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvBody = itemView.findViewById(R.id.tvBody);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
             tvTime = itemView.findViewById(R.id.tvTime);
+            image1 = itemView.findViewById(R.id.image1);
+            image2 = itemView.findViewById(R.id.image2);
+            image3 = itemView.findViewById(R.id.image3);
+            image4 = itemView.findViewById(R.id.image4);
+            imageViews = new ArrayList<>();
+            imageViews.add(image1);
+            imageViews.add(image2);
+            imageViews.add(image3);
+            imageViews.add(image4);
+
         }
 
         public void bind(Tweet tweet) {
+            Log.i(TAG, "In bind");
             tvBody.setText(tweet.body);
             tvScreenName.setText(tweet.user.screenName);
             tvTime.setText(getRelativeTimeAgo(tweet.createdAt));
             Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
+            if (tweet.extendedEntitiesFlag) {
+                Log.i(TAG, "Tweet has extended entities");
+                bindImages(tweet);
+            }
+        }
+
+        public void bindImages(Tweet tweet) {
+            Log.i(TAG, "Binding images");
+            int numImages = tweet.extendedEntities.mediaList.size();
+            if (numImages == 0) {
+                Log.i(TAG, "No images");
+                return;
+            }
+            int i;
+            for (i = 0; i < numImages; i++) {
+                ImageView imgView = imageViews.get(i);
+                Media tweetImage = tweet.extendedEntities.mediaList.get(i);
+                imgView.getLayoutParams().height = tweetImage.height;
+                imgView.getLayoutParams().width = tweetImage.width;
+                Glide.with(context).load(tweetImage.mediaUrlHttps)
+                        .into(imgView);
+            }
+            Log.d(TAG, "Unused Images " + i);
+            for (int j = i; j <= 3; j++) {
+                // Get rid of un needed imageViews
+                imageViews.get(j).setVisibility(View.GONE);
+            }
+            return;
+
         }
 
         // Convert created_at time to relative time

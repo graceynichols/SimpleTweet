@@ -1,5 +1,7 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Parcel
 public class Tweet {
+    public static String TAG = "Tweet";
     public String body;
     public String createdAt;
     public User user;
@@ -25,6 +28,7 @@ public class Tweet {
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
         if (jsonObject.has("extended_entities")) {
+            // Tweet has native images to display
             tweet.extendedEntities = ExtendedEntities.fromJson(jsonObject.getJSONObject("extended_entities"));
             // TODO a flag probably isn't the best way to keep track of this
             tweet.extendedEntitiesFlag = true;

@@ -1,5 +1,7 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,7 @@ import java.util.List;
 @Parcel
 public class ExtendedEntities {
     public List<Media> mediaList;
+    public static String TAG = "ExtendedEntities";
 
     // Empty constructor for parcel library
     public ExtendedEntities() {}
@@ -18,11 +21,24 @@ public class ExtendedEntities {
     public static ExtendedEntities fromJson(JSONObject jsonObject) throws JSONException {
         ExtendedEntities extendedEntities = new ExtendedEntities();
         extendedEntities.mediaList = new ArrayList<>();
+        Log.i(TAG, jsonObject.toString());
         // Convert each media object from json
-        JSONArray mediaJson = jsonObject.getJSONArray("media");
-        for (int i = 0; i < mediaJson.length(); i++) {
-            extendedEntities.mediaList.add(Media.fromJson((JSONObject) (mediaJson.get(i))));
+        if (jsonObject.has("media")) {
+            JSONArray mediaJson = jsonObject.getJSONArray("media");
+            for (int i = 0; i < mediaJson.length(); i++) {
+                // Convert each media object from JSON and add to media list
+                Media media = Media.fromJson((JSONObject) (mediaJson.get(i)));
+                Log.d(TAG, "Media Type: " + media.type);
+                extendedEntities.mediaList.add(media);
+                // TODO only adds photos
+                /*
+                if (media.type.equals("photo")) {
+                    extendedEntities.mediaList.add(media);
+                }*/
+
+            }
         }
         return extendedEntities;
+
     }
 }
