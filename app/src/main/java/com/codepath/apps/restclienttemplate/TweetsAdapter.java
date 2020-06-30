@@ -109,12 +109,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             Log.i(TAG, "In bind");
             // Set all text information
             tvBody.setText(tweet.getBody());
-            tvScreenName.setText(tweet.getUser().getScreenName());
+            String username = context.getString(R.string.at) + tweet.getUser().getScreenName();
+            tvScreenName.setText(username);
             tvTime.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
             tvName.setText(tweet.getUser().getName());
 
             // Load profile pic
-            Glide.with(context).load(tweet.getUser().getProfileImageUrl()).into(ivProfileImage);
+            Glide.with(context).load(tweet.getUser().getProfileImageUrl()).circleCrop().into(ivProfileImage);
 
             // Check if there are images to be added
             if (tweet.isExtendedEntitiesFlag()) {
