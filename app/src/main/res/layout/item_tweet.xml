@@ -51,8 +51,8 @@
 
     <ImageView
         android:id="@+id/image1"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_below="@+id/tvBody"
         android:layout_alignParentStart="true"
         android:layout_marginStart="5dp"
@@ -61,34 +61,35 @@
 
     <ImageView
         android:id="@+id/image2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_below="@+id/tvBody"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:layout_toEndOf="@+id/image1"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
         android:id="@+id/image3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/image1"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/tvBody"
+        android:layout_alignParentBottom="false"
+        android:layout_centerVertical="false"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="15dp"
+        android:layout_toEndOf="@+id/image2"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
         android:id="@+id/image4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/image2"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="39dp"
-        android:layout_marginTop="34dp"
-        android:layout_marginEnd="82dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/tvBody"
+        android:layout_alignParentBottom="false"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="15dp"
         android:layout_toEndOf="@+id/image3"
         tools:srcCompat="@tools:sample/avatars" />
 

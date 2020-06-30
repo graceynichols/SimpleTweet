@@ -13,11 +13,11 @@ import java.util.List;
 @Parcel
 public class Tweet {
     public static String TAG = "Tweet";
-    public String body;
-    public String createdAt;
-    public User user;
-    public ExtendedEntities extendedEntities;
-    public boolean extendedEntitiesFlag;
+    private String body;
+    private String createdAt;
+    private User user;
+    private ExtendedEntities extendedEntities;
+    private boolean extendedEntitiesFlag;
 
     // Empty constructor for Parceler library
     public Tweet() {}
@@ -44,5 +44,29 @@ public class Tweet {
             tweets.add(fromJson(jsonArray.getJSONObject(i)));
         }
         return tweets;
+    }
+
+    public static String getTAG() {
+        return TAG;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public ExtendedEntities getExtendedEntities() {
+        return extendedEntities;
+    }
+
+    public boolean isExtendedEntitiesFlag() {
+        return extendedEntitiesFlag;
     }
 }

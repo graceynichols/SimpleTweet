@@ -10,11 +10,11 @@ import org.parceler.Parcel;
 @Parcel
 public class Media {
 
-    public String mediaUrlHttps;
-    public String type;
+    private String mediaUrlHttps;
+    private String type;
     // TODO how should I save size?
-    public int width;
-    public int height;
+    private int width;
+    private int height;
     //public JSONObject sizes;
 
     // Empty constructor for parcel library
@@ -33,5 +33,19 @@ public class Media {
         return media;
     }
 
+    public String getMediaUrlHttps() {
+        return mediaUrlHttps;
+    }
 
+    public String getType() {
+        return type;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 }

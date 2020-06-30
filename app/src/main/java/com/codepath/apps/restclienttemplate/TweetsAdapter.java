@@ -101,36 +101,50 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         public void bind(Tweet tweet) {
             Log.i(TAG, "In bind");
-            tvBody.setText(tweet.body);
-            tvScreenName.setText(tweet.user.screenName);
-            tvTime.setText(getRelativeTimeAgo(tweet.createdAt));
-            Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
-            if (tweet.extendedEntitiesFlag) {
+            tvBody.setText(tweet.getBody());
+            tvScreenName.setText(tweet.getUser().getScreenName());
+            tvTime.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
+            Glide.with(context).load(tweet.getUser().getProfileImageUrl()).into(ivProfileImage);
+            if (tweet.isExtendedEntitiesFlag()) {
                 Log.i(TAG, "Tweet has extended entities");
                 bindImages(tweet);
+                return;
+            } else {
+                //TODO clear out unused imageviews?
+                for (int j = 0; j <= 3; j++) {
+                    // Get rid of un needed imageViews
+                    ImageView unusedView = imageViews.get(j);
+                    unusedView.getLayoutParams().height = 1;
+                    unusedView.getLayoutParams().width = 1;
+                    unusedView.setVisibility(View.GONE);
+                }
+                return;
             }
         }
 
         public void bindImages(Tweet tweet) {
             Log.i(TAG, "Binding images");
-            int numImages = tweet.extendedEntities.mediaList.size();
-            if (numImages == 0) {
-                Log.i(TAG, "No images");
-                return;
-            }
+            int numImages = tweet.getExtendedEntities().getMediaList().size();
             int i;
             for (i = 0; i < numImages; i++) {
                 ImageView imgView = imageViews.get(i);
-                Media tweetImage = tweet.extendedEntities.mediaList.get(i);
-                imgView.getLayoutParams().height = tweetImage.height;
-                imgView.getLayoutParams().width = tweetImage.width;
-                Glide.with(context).load(tweetImage.mediaUrlHttps)
+                Media tweetImage = tweet.getExtendedEntities().getMediaList().get(i);
+                // TODO: probably should be cropped to thumbnail
+                //imgView.getLayoutParams().height = tweetImage.getHeight();
+                //imgView.getLayoutParams().width = tweetImage.getWidth();
+                imgView.getLayoutParams().height = 225;
+                imgView.getLayoutParams().width = 225;
+                Glide.with(context).load(tweetImage.getMediaUrlHttps()).circleCrop()
                         .into(imgView);
+
             }
             Log.d(TAG, "Unused Images " + i);
             for (int j = i; j <= 3; j++) {
                 // Get rid of un needed imageViews
-                imageViews.get(j).setVisibility(View.GONE);
+                ImageView unusedView = imageViews.get(j);
+                unusedView.getLayoutParams().height = 1;
+                unusedView.getLayoutParams().width = 1;
+                unusedView.setVisibility(View.GONE);
             }
             return;
 

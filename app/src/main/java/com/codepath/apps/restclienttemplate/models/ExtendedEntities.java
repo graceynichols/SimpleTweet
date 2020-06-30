@@ -12,7 +12,7 @@ import java.util.List;
 
 @Parcel
 public class ExtendedEntities {
-    public List<Media> mediaList;
+    private List<Media> mediaList;
     public static String TAG = "ExtendedEntities";
 
     // Empty constructor for parcel library
@@ -28,7 +28,7 @@ public class ExtendedEntities {
             for (int i = 0; i < mediaJson.length(); i++) {
                 // Convert each media object from JSON and add to media list
                 Media media = Media.fromJson((JSONObject) (mediaJson.get(i)));
-                Log.d(TAG, "Media Type: " + media.type);
+                Log.d(TAG, "Media Type: " + media.getType());
                 extendedEntities.mediaList.add(media);
                 // TODO only adds photos
                 /*
@@ -40,5 +40,9 @@ public class ExtendedEntities {
         }
         return extendedEntities;
 
+    }
+
+    public List<Media> getMediaList() {
+        return mediaList;
     }
 }
