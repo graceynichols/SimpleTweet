@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,8 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.activity.ImageActivity;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+
+import org.parceler.Parcels;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -75,6 +79,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView tvBody;
         TextView tvScreenName;
         TextView tvTime;
+        TextView tvName;
         List<ImageView> imageViews;
         ImageView image1;
         ImageView image2;
@@ -86,6 +91,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
             tvBody = itemView.findViewById(R.id.tvBody);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
+            tvName = itemView.findViewById(R.id.tvName);
             tvTime = itemView.findViewById(R.id.tvTime);
             image1 = itemView.findViewById(R.id.image1);
             image2 = itemView.findViewById(R.id.image2);
@@ -101,16 +107,21 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         public void bind(Tweet tweet) {
             Log.i(TAG, "In bind");
+            // Set all text information
             tvBody.setText(tweet.getBody());
             tvScreenName.setText(tweet.getUser().getScreenName());
             tvTime.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
+            tvName.setText(tweet.getUser().getName());
+
+            // Load profile pic
             Glide.with(context).load(tweet.getUser().getProfileImageUrl()).into(ivProfileImage);
+
+            // Check if there are images to be added
             if (tweet.isExtendedEntitiesFlag()) {
                 Log.i(TAG, "Tweet has extended entities");
                 bindImages(tweet);
                 return;
             } else {
-                //TODO clear out unused imageviews?
                 for (int j = 0; j <= 3; j++) {
                     // Get rid of un needed imageViews
                     ImageView unusedView = imageViews.get(j);
@@ -128,7 +139,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             int i;
             for (i = 0; i < numImages; i++) {
                 ImageView imgView = imageViews.get(i);
-                Media tweetImage = tweet.getExtendedEntities().getMediaList().get(i);
+                final Media tweetImage = tweet.getExtendedEntities().getMediaList().get(i);
                 // TODO: probably should be cropped to thumbnail
                 //imgView.getLayoutParams().height = tweetImage.getHeight();
                 //imgView.getLayoutParams().width = tweetImage.getWidth();
@@ -136,6 +147,20 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 imgView.getLayoutParams().width = 225;
                 Glide.with(context).load(tweetImage.getMediaUrlHttps()).circleCrop()
                         .into(imgView);
+                // Attach on click listener to thumbnail
+                imgView.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        Log.i(TAG, "Image thumbnail clicked");
+                        // Launch ImageActivity
+                        Intent intent = new Intent(context, ImageActivity.class);
+                        // Serialize the movie using parceler
+                        intent.putExtra(Media.class.getSimpleName(), Parcels.wrap(tweetImage));
+                        context.startActivity(intent);
+
+                    }
+                });
 
             }
             Log.d(TAG, "Unused Images " + i);
