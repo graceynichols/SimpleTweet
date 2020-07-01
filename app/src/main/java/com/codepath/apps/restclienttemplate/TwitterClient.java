@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.codepath.asynchttpclient.RequestParams;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -22,6 +23,7 @@ import com.github.scribejava.core.builder.api.BaseApi;
  * 
  */
 public class TwitterClient extends OAuthBaseClient {
+	private static final String TAG = "TwitterClient";
 	public static final BaseApi REST_API_INSTANCE = TwitterApi.instance(); // Change this
 	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
 	// TODO BuildConfig not working
@@ -63,6 +65,27 @@ public class TwitterClient extends OAuthBaseClient {
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("status", tweetContent);
+
+		// Do POST request
+		client.post(apiUrl, params, "", handler);
+	}
+
+	public void retweet(String tweetId, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/retweet/" + tweetId + ".json");
+		Log.i(TAG, "Tweet ID :" + tweetId);
+		Log.i(TAG, "Got API URL :" + apiUrl);
+		// Can specify query string params directly or through RequestParams.
+		RequestParams params = new RequestParams();
+
+		// Do POST request
+		client.post(apiUrl, params, "", handler);
+	}
+
+
+	public void favorite(String tweetId, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("favorites/create.json?id=" + tweetId);
+		// Can specify query string params directly or through RequestParams.
+		RequestParams params = new RequestParams();
 
 		// Do POST request
 		client.post(apiUrl, params, "", handler);

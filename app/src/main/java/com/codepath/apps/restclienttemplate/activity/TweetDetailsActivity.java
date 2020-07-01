@@ -8,13 +8,17 @@ import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.restclienttemplate.TwitterApp;
+import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.parceler.Parcels;
 
@@ -24,8 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.Headers;
+
 public class TweetDetailsActivity extends AppCompatActivity {
     private static String TAG = "TweetDetailsActivity";
+    TwitterClient client;
     Context context = this;
     Tweet tweet;
     ImageView ivProfileImage;
@@ -40,11 +47,15 @@ public class TweetDetailsActivity extends AppCompatActivity {
     ImageView image2;
     ImageView image3;
     ImageView image4;
+    ImageView retweet;
+    ImageView like;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_details);
+
+        client = TwitterApp.getRestClient(this);
 
         tweet = (Tweet) Parcels.unwrap(getIntent().getParcelableExtra(Tweet.class.getSimpleName()));
 
@@ -55,6 +66,8 @@ public class TweetDetailsActivity extends AppCompatActivity {
         tvTime = findViewById(R.id.tvTime);
         favoriteCount = findViewById(R.id.favoriteCount);
         retweetCount = findViewById(R.id.retweetCount);
+        retweet = findViewById(R.id.retweet);
+        like = findViewById(R.id.like);
         image1 = findViewById(R.id.image1);
         image2 = findViewById(R.id.image2);
         image3 = findViewById(R.id.image3);
@@ -75,6 +88,50 @@ public class TweetDetailsActivity extends AppCompatActivity {
 
         // Load profile pic
         Glide.with(this).load(tweet.getUser().getProfileImageUrl()).circleCrop().into(ivProfileImage);
+
+        // Set on click listeners for retweet and favorite buttons
+        retweet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                client.retweet(tweet.getId(), new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        Log.i(TAG, "Retweet successful");
+                        // Make retweet bold and increase retweet count
+                        retweet.setImageResource(R.drawable.ic_vector_retweet);
+                        tweet.addOneRetweet();
+                        retweetCount.setText(tweet.getRetweet_count() + 1);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        Log.e(TAG, "Retweet failed", throwable);
+                    }
+                });
+            }
+        });
+
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                client.favorite(tweet.getId(), new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        Log.i(TAG, "Favorite successful");
+                        // Fill in heart button
+                        like.setImageResource(R.drawable.ic_vector_heart);
+                        tweet.addOneFavorite();
+                        favoriteCount.setText(tweet.getFavorite_count() + 1);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        Log.e(TAG, "Favorite failed", throwable);
+                    }
+                });
+
+            }
+        });
 
         // Check if there are images to be added
         if (tweet.isExtendedEntitiesFlag()) {

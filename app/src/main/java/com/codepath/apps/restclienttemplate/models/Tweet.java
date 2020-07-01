@@ -19,6 +19,7 @@ public class Tweet {
     private ExtendedEntities extendedEntities;
     private int favorite_count;
     private int retweet_count;
+    private String id;
     //private int reply_count;
     private boolean extendedEntitiesFlag;
 
@@ -32,6 +33,7 @@ public class Tweet {
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
         tweet.favorite_count = jsonObject.getInt("favorite_count");
         tweet.retweet_count = jsonObject.getInt("retweet_count");
+        tweet.id = jsonObject.getString("id_str");
         //tweet.reply_count = jsonObject.getInt("reply_count");
         if (jsonObject.has("extended_entities")) {
             // Tweet has native images to display
@@ -82,6 +84,20 @@ public class Tweet {
 
     public int getRetweet_count() {
         return retweet_count;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public int addOneRetweet() {
+        retweet_count = retweet_count + 1;
+        return retweet_count;
+    }
+
+    public int addOneFavorite() {
+        favorite_count = favorite_count + 1;
+        return favorite_count;
     }
 
     //public int getReply_count() {
