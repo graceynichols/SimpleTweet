@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.activity.ImageActivity;
+import com.codepath.apps.restclienttemplate.activity.TweetDetailsActivity;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
@@ -109,8 +110,23 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         }
 
-        public void bind(Tweet tweet) {
+        public void bind(final Tweet tweet) {
             Log.i(TAG, "In bind");
+
+            // Set on click listener for tweet
+            itemView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    Log.i(TAG, "Image thumbnail clicked");
+                    // Launch DetailsActivity
+                    Intent intent = new Intent(context, TweetDetailsActivity.class);
+                    // Serialize the tweet using parceler
+                    intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
+                    context.startActivity(intent);
+
+                }
+            });
             // Set all text information
             bindStats(tweet);
             tvBody.setText(tweet.getBody());
