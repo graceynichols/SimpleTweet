@@ -112,8 +112,8 @@
 
     <ImageView
         android:id="@+id/retweet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
         android:layout_below="@+id/image3"
         android:layout_alignParentStart="true"
         android:layout_marginStart="65dp"
@@ -122,12 +122,12 @@
 
     <ImageView
         android:id="@+id/like"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/retweet"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_alignTop="@id/retweet"
         android:layout_alignParentEnd="false"
         android:layout_marginStart="47dp"
-        android:layout_marginTop="-12dp"
+        android:layout_marginTop="0dp"
         android:layout_marginBottom="5dp"
         android:layout_toEndOf="@+id/retweet"
         app:srcCompat="@drawable/ic_vector_heart_stroke" />
@@ -138,7 +138,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/retweet"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="3dp"
         android:layout_toEndOf="@+id/retweet"
         android:text="TextView"
         android:textSize="8sp" />
@@ -149,7 +149,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/like"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="3dp"
         android:layout_toEndOf="@+id/like"
         android:text="TextView"
         android:textSize="8sp" />

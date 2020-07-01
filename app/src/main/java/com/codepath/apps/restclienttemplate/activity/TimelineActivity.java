@@ -103,6 +103,11 @@ public class TimelineActivity extends AppCompatActivity {
             adapter.notifyItemInserted(0);
             rvTweets.smoothScrollToPosition(0);
         }
+
+        if (requestCode == 30 && resultCode == RESULT_OK) {
+            // Get data from the intent (tweet)
+            Log.i(TAG, "Returning from favorite");
+        }
         super.onActivityResult(requestCode, resultCode, data);
 
     }

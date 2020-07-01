@@ -1,5 +1,6 @@
 package com.codepath.apps.restclienttemplate;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateUtils;
@@ -11,10 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.activity.ImageActivity;
+import com.codepath.apps.restclienttemplate.activity.TimelineActivity;
 import com.codepath.apps.restclienttemplate.activity.TweetDetailsActivity;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
@@ -27,9 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static androidx.core.app.ActivityCompat.startActivityForResult;
+
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>{
 
     private static String TAG = "TweetsAdapter";
+    private static int REQUEST_CODE = 30;
     Context context;
     List<Tweet> tweets;
 
@@ -88,6 +96,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         ImageView image2;
         ImageView image3;
         ImageView image4;
+        ImageView retweet;
+        ImageView like;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -98,6 +108,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvTime = itemView.findViewById(R.id.tvTime);
             favoriteCount = itemView.findViewById(R.id.favoriteCount);
             retweetCount = itemView.findViewById(R.id.retweetCount);
+            like = itemView.findViewById(R.id.like);
+            retweet = itemView.findViewById(R.id.retweet);
             image1 = itemView.findViewById(R.id.image1);
             image2 = itemView.findViewById(R.id.image2);
             image3 = itemView.findViewById(R.id.image3);
@@ -113,7 +125,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         public void bind(final Tweet tweet) {
             Log.i(TAG, "In bind");
 
-            // Set on click listener for tweet
+            // Set on click listener for tweet detail view
             itemView.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -123,10 +135,19 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     Intent intent = new Intent(context, TweetDetailsActivity.class);
                     // Serialize the tweet using parceler
                     intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
-                    context.startActivity(intent);
+                    //context.startActivity(intent);
+                    ((Activity) context).startActivityForResult(intent, REQUEST_CODE);
 
                 }
             });
+
+            // Check if retweet/favorite icons need to be filled in
+            if (tweet.isRetweeted()) {
+                retweet.setImageResource(R.drawable.ic_vector_retweet);
+            }
+            if (tweet.isFavorited()) {
+                like.setImageResource(R.drawable.ic_vector_heart);
+            }
             // Set all text information
             bindStats(tweet);
             tvBody.setText(tweet.getBody());
@@ -154,6 +175,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 return;
             }
         }
+
+
 
         // Bind the stats for the tweet
         public void bindStats(Tweet tweet) {

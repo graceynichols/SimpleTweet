@@ -22,6 +22,8 @@ public class Tweet {
     private String id;
     //private int reply_count;
     private boolean extendedEntitiesFlag;
+    private boolean favorited;
+    private boolean retweeted;
 
     // Empty constructor for Parceler library
     public Tweet() {}
@@ -33,6 +35,8 @@ public class Tweet {
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
         tweet.favorite_count = jsonObject.getInt("favorite_count");
         tweet.retweet_count = jsonObject.getInt("retweet_count");
+        tweet.favorited = jsonObject.getBoolean("favorited");
+        tweet.retweeted = jsonObject.getBoolean("retweeted");
         tweet.id = jsonObject.getString("id_str");
         //tweet.reply_count = jsonObject.getInt("reply_count");
         if (jsonObject.has("extended_entities")) {
@@ -95,9 +99,35 @@ public class Tweet {
         return retweet_count;
     }
 
+    public int subOneRetweet() {
+        retweet_count = retweet_count - 1;
+        return retweet_count;
+    }
+
     public int addOneFavorite() {
         favorite_count = favorite_count + 1;
         return favorite_count;
+    }
+
+    public int subOneFavorite() {
+        favorite_count = favorite_count - 1;
+        return favorite_count;
+    }
+
+    public boolean isFavorited() {
+        return favorited;
+    }
+
+    public boolean isRetweeted() {
+        return retweeted;
+    }
+
+    public void toggleFavorited() {
+        favorited = !favorited;
+    }
+
+    public void toggleRetweeted() {
+        retweeted = !retweeted;
     }
 
     //public int getReply_count() {

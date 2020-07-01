@@ -86,6 +86,14 @@ public class TweetDetailsActivity extends AppCompatActivity {
         tvTime.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
         tvName.setText(tweet.getUser().getName());
 
+        // Check if retweet/favorite icons need to be filled in
+        if (tweet.isRetweeted()) {
+            retweet.setImageResource(R.drawable.ic_vector_retweet);
+        }
+        if (tweet.isFavorited()) {
+            like.setImageResource(R.drawable.ic_vector_heart);
+        }
+
         // Load profile pic
         Glide.with(this).load(tweet.getUser().getProfileImageUrl()).circleCrop().into(ivProfileImage);
 
@@ -93,42 +101,84 @@ public class TweetDetailsActivity extends AppCompatActivity {
         retweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                client.retweet(tweet.getId(), new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        Log.i(TAG, "Retweet successful");
-                        // Make retweet bold and increase retweet count
-                        retweet.setImageResource(R.drawable.ic_vector_retweet);
-                        tweet.addOneRetweet();
-                        retweetCount.setText(tweet.getRetweet_count() + 1);
-                    }
+                if (tweet.isRetweeted()) {
+                    client.unRetweet(tweet.getId(), new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            Log.i(TAG, "Unretweet successful");
+                            // Make retweet bold and increase retweet count
+                            retweet.setImageResource(R.drawable.ic_vector_retweet_stroke);
+                            tweet.subOneRetweet();
+                            retweetCount.setText("" + tweet.getRetweet_count());
+                            tweet.toggleRetweeted();
+                        }
 
-                    @Override
-                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                        Log.e(TAG, "Retweet failed", throwable);
-                    }
-                });
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e(TAG, "Unretweet failed", throwable);
+                        }
+                    });
+                } else {
+                    client.retweet(tweet.getId(), new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            Log.i(TAG, "Retweet successful");
+                            // Make retweet bold and increase retweet count
+                            retweet.setImageResource(R.drawable.ic_vector_retweet);
+                            tweet.addOneRetweet();
+                            retweetCount.setText("" + tweet.getRetweet_count());
+                            tweet.toggleRetweeted();
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e(TAG, "Retweet failed", throwable);
+                        }
+                    });
+                }
+
             }
         });
 
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                client.favorite(tweet.getId(), new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        Log.i(TAG, "Favorite successful");
-                        // Fill in heart button
-                        like.setImageResource(R.drawable.ic_vector_heart);
-                        tweet.addOneFavorite();
-                        favoriteCount.setText(tweet.getFavorite_count() + 1);
-                    }
+                if (tweet.isFavorited()) {
+                    client.unFavorite(tweet.getId(), new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            Log.i(TAG, "UnFavorite successful");
+                            // Fill in heart button
+                            like.setImageResource(R.drawable.ic_vector_heart_stroke);
+                            tweet.subOneFavorite();
+                            favoriteCount.setText("" + tweet.getFavorite_count());
+                            tweet.toggleFavorited();
+                        }
 
-                    @Override
-                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                        Log.e(TAG, "Favorite failed", throwable);
-                    }
-                });
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e(TAG, "UnFavorite failed", throwable);
+                        }
+                    });
+                } else {
+                    client.favorite(tweet.getId(), new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            Log.i(TAG, "Favorite successful");
+                            // Fill in heart button
+                            like.setImageResource(R.drawable.ic_vector_heart);
+                            tweet.addOneFavorite();
+                            favoriteCount.setText("" + tweet.getFavorite_count());
+                            tweet.toggleFavorited();
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e(TAG, "Favorite failed", throwable);
+                        }
+                    });
+
+                }
 
             }
         });
