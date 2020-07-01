@@ -13,7 +13,7 @@ import java.util.List;
 @Parcel
 public class ExtendedEntities {
     private List<Media> mediaList;
-    public static String TAG = "ExtendedEntities";
+    private static String TAG = "ExtendedEntities";
 
     // Empty constructor for parcel library
     public ExtendedEntities() {}

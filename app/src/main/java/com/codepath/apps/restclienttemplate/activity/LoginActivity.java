@@ -15,7 +15,7 @@ import com.codepath.apps.restclienttemplate.models.SampleModelDao;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
 
 public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
-	public static final String TAG = "LoginActivity";
+	private static final String TAG = "LoginActivity";
 
 	SampleModelDao sampleModelDao;
 	

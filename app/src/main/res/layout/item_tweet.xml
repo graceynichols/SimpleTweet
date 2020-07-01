@@ -120,4 +120,48 @@
         android:layout_toRightOf="@id/tvScreenName"
         app:srcCompat="@android:drawable/radiobutton_off_background" />
 
+    <ImageView
+        android:id="@+id/retweet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/image1"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="69dp"
+        android:layout_marginTop="20dp"
+        app:srcCompat="@drawable/ic_vector_retweet_stroke" />
+
+    <ImageView
+        android:id="@+id/like"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/retweet"
+        android:layout_alignParentEnd="false"
+        android:layout_marginStart="47dp"
+        android:layout_marginTop="-12dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toEndOf="@+id/retweet"
+        app:srcCompat="@drawable/ic_vector_heart_stroke" />
+
+    <TextView
+        android:id="@+id/retweetCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/image1"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="20dp"
+        android:layout_toEndOf="@+id/retweet"
+        android:text="TextView"
+        android:textSize="8sp" />
+
+    <TextView
+        android:id="@+id/favoriteCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/image1"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="20dp"
+        android:layout_toEndOf="@+id/like"
+        android:text="TextView"
+        android:textSize="8sp" />
+
 </RelativeLayout>

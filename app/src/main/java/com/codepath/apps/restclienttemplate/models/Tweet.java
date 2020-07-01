@@ -12,11 +12,14 @@ import java.util.List;
 
 @Parcel
 public class Tweet {
-    public static String TAG = "Tweet";
+    private static String TAG = "Tweet";
     private String body;
     private String createdAt;
     private User user;
     private ExtendedEntities extendedEntities;
+    private int favorite_count;
+    private int retweet_count;
+    //private int reply_count;
     private boolean extendedEntitiesFlag;
 
     // Empty constructor for Parceler library
@@ -27,6 +30,9 @@ public class Tweet {
         tweet.body = jsonObject.getString("text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
+        tweet.favorite_count = jsonObject.getInt("favorite_count");
+        tweet.retweet_count = jsonObject.getInt("retweet_count");
+        //tweet.reply_count = jsonObject.getInt("reply_count");
         if (jsonObject.has("extended_entities")) {
             // Tweet has native images to display
             tweet.extendedEntities = ExtendedEntities.fromJson(jsonObject.getJSONObject("extended_entities"));
@@ -69,4 +75,16 @@ public class Tweet {
     public boolean isExtendedEntitiesFlag() {
         return extendedEntitiesFlag;
     }
+
+    public int getFavorite_count() {
+        return favorite_count;
+    }
+
+    public int getRetweet_count() {
+        return retweet_count;
+    }
+
+    //public int getReply_count() {
+        //return reply_count;
+    //}
 }

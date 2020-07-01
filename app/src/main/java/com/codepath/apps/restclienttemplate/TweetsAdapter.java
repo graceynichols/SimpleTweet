@@ -28,7 +28,7 @@ import java.util.Locale;
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>{
 
-    public static String TAG = "TweetsAdapter";
+    private static String TAG = "TweetsAdapter";
     Context context;
     List<Tweet> tweets;
 
@@ -80,6 +80,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView tvScreenName;
         TextView tvTime;
         TextView tvName;
+        TextView favoriteCount;
+        TextView retweetCount;
         List<ImageView> imageViews;
         ImageView image1;
         ImageView image2;
@@ -93,6 +95,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
             tvName = itemView.findViewById(R.id.tvName);
             tvTime = itemView.findViewById(R.id.tvTime);
+            favoriteCount = itemView.findViewById(R.id.favoriteCount);
+            retweetCount = itemView.findViewById(R.id.retweetCount);
             image1 = itemView.findViewById(R.id.image1);
             image2 = itemView.findViewById(R.id.image2);
             image3 = itemView.findViewById(R.id.image3);
@@ -108,6 +112,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         public void bind(Tweet tweet) {
             Log.i(TAG, "In bind");
             // Set all text information
+            bindStats(tweet);
             tvBody.setText(tweet.getBody());
             String username = context.getString(R.string.at) + tweet.getUser().getScreenName();
             tvScreenName.setText(username);
@@ -132,6 +137,14 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 }
                 return;
             }
+        }
+
+        // Bind the stats for the tweet
+        public void bindStats(Tweet tweet) {
+            // TODO replies
+            retweetCount.setText("" + tweet.getRetweet_count());
+            favoriteCount.setText("" + tweet.getFavorite_count());
+
         }
 
         public void bindImages(Tweet tweet) {
