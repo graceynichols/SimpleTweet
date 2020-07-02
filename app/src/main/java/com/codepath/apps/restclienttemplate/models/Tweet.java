@@ -1,7 +1,5 @@
 package com.codepath.apps.restclienttemplate.models;
 
-import android.util.Log;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -20,6 +18,7 @@ import java.util.List;
 @Parcel
 @Entity(foreignKeys = @ForeignKey(entity=User.class, parentColumns="id", childColumns="userId"))
 public class Tweet {
+
     private static String TAG = "Tweet";
 
     @ColumnInfo
@@ -51,6 +50,7 @@ public class Tweet {
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
+        // Populate tweet fields
         tweet.body = jsonObject.getString("text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
@@ -60,11 +60,12 @@ public class Tweet {
         tweet.retweeted = jsonObject.getBoolean("retweeted");
         tweet.idLong = jsonObject.getLong("id");
         tweet.userId = tweet.user.getId();
-        //tweet.reply_count = jsonObject.getInt("reply_count");
+
         if (jsonObject.has("extended_entities")) {
             // Tweet has native images to display
             ExtendedEntities extendedEntities = ExtendedEntities.fromJson(jsonObject.getJSONObject("extended_entities"));
             tweet.extendedEntitiesFlag = true;
+            // Save media urls as string for easy saving to database
             tweet.mediaUrlString = extendedEntities.getMediaUrlsString();
         } else {
             tweet.extendedEntitiesFlag = false;
@@ -80,8 +81,8 @@ public class Tweet {
         return tweets;
     }
 
-    public static String getTAG() {
-        return TAG;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public String getBody() {
@@ -111,7 +112,6 @@ public class Tweet {
     public int getRetweet_count() {
         return retweet_count;
     }
-
 
     public int addOneRetweet() {
         retweet_count = retweet_count + 1;
@@ -166,11 +166,6 @@ public class Tweet {
         this.user = user;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-
     public void setFavorite_count(int favorite_count) {
         this.favorite_count = favorite_count;
     }
@@ -191,10 +186,6 @@ public class Tweet {
         this.retweeted = retweeted;
     }
 
-    public void setImageUrlsString(String imageUrlsString) {
-        this.mediaUrlString = imageUrlsString;
-    }
-
     public List<String> getMediaUrlArray() {
         return Arrays.asList(mediaUrlString.split(","));
     }
@@ -202,8 +193,4 @@ public class Tweet {
     public void setMediaUrlString(String mediaUrlString) {
         this.mediaUrlString = mediaUrlString;
     }
-
-    //public int getReply_count() {
-        //return reply_count;
-    //}
 }

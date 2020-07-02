@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Parcel
@@ -31,30 +30,17 @@ public class ExtendedEntities {
                 Media media = Media.fromJson((JSONObject) (mediaJson.get(i)));
                 Log.d(TAG, "Media Type: " + media.getType());
                 extendedEntities.mediaList.add(media);
-                /*
-                if (media.type.equals("photo")) {
-                    extendedEntities.mediaList.add(media);
-                }*/
-
             }
         }
         return extendedEntities;
-
     }
 
     public List<Media> getMediaList() {
         return mediaList;
     }
 
-    public List<String> getMediaUrls() {
-        List<String> urls = new ArrayList<>();
-        for (int i = 0; i < mediaList.size(); i++) {
-            urls.add(mediaList.get(i).getMediaUrlHttps());
-        }
-        return urls;
-    }
-
     public String getMediaUrlsString() {
+        // Get url's in string format for saving in database
         String urls = "";
         for (int i = 0; i < mediaList.size(); i++) {
             urls += (mediaList.get(i).getMediaUrlHttps());

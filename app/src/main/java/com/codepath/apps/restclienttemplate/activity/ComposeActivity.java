@@ -34,14 +34,14 @@ public class ComposeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Set up view binding
         binding = ActivityComposeBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
 
-
         client = TwitterApp.getRestClient(this);
 
-        // Set click listener on button
+        // Set click listener on tweet button
         binding.btnTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,7 +57,6 @@ public class ComposeActivity extends AppCompatActivity {
                 // Make an API call to Twitter to publish tweet
                 Log.d(TAG, "Valid tweet entered");
                 Toast.makeText(ComposeActivity.this, tweetContent, Toast.LENGTH_SHORT);
-
                 client.publishTweet(tweetContent, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
@@ -70,19 +69,16 @@ public class ComposeActivity extends AppCompatActivity {
                             // Send result and go back timeline activity
                             setResult(RESULT_OK, intent);
                             finish();
-
                         } catch (JSONException e) {
                             Log.e(TAG, "Error from fromJson");
                             e.printStackTrace();
                         }
                     }
-
                     @Override
                     public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                         Log.e(TAG, "onFailure to publish tweet", throwable);
                     }
                 });
-
             }
         });
     }

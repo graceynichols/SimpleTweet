@@ -8,16 +8,13 @@ import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.databinding.ActivityTweetDetailsBinding;
-import com.codepath.apps.restclienttemplate.models.ExtendedEntities;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -36,11 +33,11 @@ public class TweetDetailsActivity extends AppCompatActivity {
     private static String TAG = "TweetDetailsActivity";
     private static ActivityTweetDetailsBinding binding;
     private int IMAGE_SIZE = 225;
-    TwitterClient client;
-    Context context = this;
-    Tweet tweet;
-    List<ImageView> imageViews;
+    private Context context = this;
+    private List<ImageView> imageViews;
 
+    TwitterClient client;
+    Tweet tweet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +48,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
 
         client = TwitterApp.getRestClient(this);
 
-        tweet = (Tweet) Parcels.unwrap(getIntent().getParcelableExtra(Tweet.class.getSimpleName()));
+        tweet = Parcels.unwrap(getIntent().getParcelableExtra(Tweet.class.getSimpleName()));
         imageViews = new ArrayList<>();
         imageViews.add(binding.image1);
         imageViews.add(binding.image2);
@@ -86,14 +83,9 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "Unretweet successful");
-                            // Make retweet bold and increase retweet count
-                            // TODO externalize repeated code
-                            binding.retweet.setImageResource(R.drawable.ic_vector_retweet_stroke);
-                            tweet.subOneRetweet();
-                            binding.retweetCount.setText("" + tweet.getRetweet_count());
-                            tweet.setRetweeted(false);
+                            // Make retweet not bold and decrease retweet count
+                            updateCount(true, false, tweet);
                         }
-
                         @Override
                         public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                             Log.e(TAG, "Unretweet failed", throwable);
@@ -105,22 +97,16 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "Retweet successful");
                             // Make retweet bold and increase retweet count
-                            binding.retweet.setImageResource(R.drawable.ic_vector_retweet);
-                            tweet.addOneRetweet();
-                            binding.retweetCount.setText("" + tweet.getRetweet_count());
-                            tweet.setRetweeted(true);;
+                            updateCount(true, true, tweet);
                         }
-
                         @Override
                         public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                             Log.e(TAG, "Retweet failed", throwable);
                         }
                     });
                 }
-
             }
         });
-
         binding.like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,13 +115,9 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "UnFavorite successful");
-                            // Fill in heart button
-                            binding.like.setImageResource(R.drawable.ic_vector_heart_stroke);
-                            tweet.subOneFavorite();
-                            binding.favoriteCount.setText("" + tweet.getFavorite_count());
-                            tweet.setFavorited(false);
+                            // Unfill heart button and decrease count
+                            updateCount(false, false, tweet);
                         }
-
                         @Override
                         public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                             Log.e(TAG, "UnFavorite failed", throwable);
@@ -146,35 +128,21 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "Favorite successful");
-                            // Fill in heart button
-                            binding.like.setImageResource(R.drawable.ic_vector_heart);
-                            tweet.addOneFavorite();
-                            binding.favoriteCount.setText("" + tweet.getFavorite_count());
-                            tweet.setFavorited(true);
-
+                            // Fill in heart button and increase count
+                            updateCount(false, true, tweet);
                         }
-
                         @Override
                         public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                             Log.e(TAG, "Favorite failed", throwable);
                         }
                     });
-
                 }
-
             }
         });
-
         // Check if there are images to be added
         if (tweet.isExtendedEntitiesFlag()) {
             Log.i(TAG, "Tweet has extended entities");
             bindImages(tweet);
-        } else {
-            for (int j = 0; j <= 3; j++) {
-                // Get rid of un needed imageViews
-                ImageView unusedView = imageViews.get(j);
-                unusedView.setVisibility(View.GONE);
-            }
         }
     }
 
@@ -184,7 +152,40 @@ public class TweetDetailsActivity extends AppCompatActivity {
         String likes = "" + tweet.getFavorite_count();
         binding.retweetCount.setText(retweets);
         binding.favoriteCount.setText(likes);
+    }
 
+    public void updateCount(boolean isRetweet, boolean pos, Tweet tweet) {
+        if (isRetweet) {
+            if (pos) {
+                // Tweet was retweeted
+                binding.retweet.setImageResource(R.drawable.ic_vector_retweet);
+                tweet.addOneRetweet();
+                binding.retweetCount.setText("" + tweet.getRetweet_count());
+                tweet.setRetweeted(true);
+            } else {
+                // Tweet was unretweeted
+                binding.retweet.setImageResource(R.drawable.ic_vector_retweet_stroke);
+                tweet.subOneRetweet();
+                binding.retweetCount.setText("" + tweet.getRetweet_count());
+                tweet.setRetweeted(false);
+            }
+        } else {
+            if (pos) {
+                // Tweet was favorited
+                binding.like.setImageResource(R.drawable.ic_vector_heart);
+                tweet.addOneFavorite();
+                binding.favoriteCount.setText("" + tweet.getFavorite_count());
+                tweet.setFavorited(true);
+
+            } else {
+                // Tweet was unfavorited
+
+                binding.like.setImageResource(R.drawable.ic_vector_heart_stroke);
+                tweet.subOneFavorite();
+                binding.favoriteCount.setText("" + tweet.getFavorite_count());
+                tweet.setFavorited(false);
+            }
+        }
     }
 
     public void bindImages(Tweet tweet) {
@@ -194,12 +195,13 @@ public class TweetDetailsActivity extends AppCompatActivity {
         for (i = 0; i < numImages; i++) {
             ImageView imgView = imageViews.get(i);
             final String tweetImage = tweet.getMediaUrlArray().get(i);
+            // Make image view visible
             imgView.setVisibility(View.VISIBLE);
             imgView.getLayoutParams().height = IMAGE_SIZE;
             imgView.getLayoutParams().width = IMAGE_SIZE;
             Glide.with(this).load(tweetImage).circleCrop()
                     .into(imgView);
-            // Attach on click listener to thumbnail
+            // Attach on click listener to thumbnail for ImageActivity
             imgView.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -208,12 +210,10 @@ public class TweetDetailsActivity extends AppCompatActivity {
                     // Launch ImageActivity
                     Intent intent = new Intent(context, ImageActivity.class);
                     // Serialize the media using parceler
-                    intent.putExtra(Media.class.getSimpleName(), Parcels.wrap(tweetImage));
+                    intent.putExtra(String.class.getSimpleName(), Parcels.wrap(tweetImage));
                     context.startActivity(intent);
-
                 }
             });
-
         }
     }
 
@@ -222,17 +222,14 @@ public class TweetDetailsActivity extends AppCompatActivity {
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
         SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
         sf.setLenient(true);
-
         String relativeDate = "";
         try {
             long dateMillis = sf.parse(rawJsonDate).getTime();
-            // TODO change min to just m
             relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
                     System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE).toString();
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         return relativeDate;
     }
 }

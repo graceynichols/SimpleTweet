@@ -19,7 +19,7 @@ import org.parceler.Parcels;
 public class ImageActivity extends AppCompatActivity {
     private static String TAG = "ImageActivity";
     private static ActivityImageBinding binding;
-    Media tweetImage;
+    String tweetImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +29,9 @@ public class ImageActivity extends AppCompatActivity {
         setContentView(view);
 
         Log.i(TAG, "Activity started");
-        tweetImage = (Media) Parcels.unwrap(getIntent().getParcelableExtra(Media.class.getSimpleName()));
-        Glide.with(this).load(tweetImage.getMediaUrlHttps())
+        // Receive image URL from timeline
+        tweetImage = Parcels.unwrap(getIntent().getParcelableExtra(String.class.getSimpleName()));
+        Glide.with(this).load(tweetImage)
                 .into(binding.imageView);
-
     }
 }

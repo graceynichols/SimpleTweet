@@ -17,7 +17,6 @@ import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.activity.ImageActivity;
 import com.codepath.apps.restclienttemplate.activity.TweetDetailsActivity;
 import com.codepath.apps.restclienttemplate.databinding.ItemTweetBinding;
-import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
 import org.parceler.Parcels;
@@ -105,9 +104,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     // Serialize the tweet using parceler
                     intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
                     //context.startActivity(intent);
-                    //TODO store tweets in memory
-                    ((Activity) context).startActivityForResult(intent, REQUEST_CODE);
-
+                    context.startActivity(intent);
                 }
             });
 
@@ -177,7 +174,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                         // Launch ImageActivity
                         Intent intent = new Intent(context, ImageActivity.class);
                         // Serialize the media using parceler
-                        intent.putExtra(Media.class.getSimpleName(), Parcels.wrap(tweetImage));
+                        intent.putExtra(String.class.getSimpleName(), Parcels.wrap(tweetImage));
                         context.startActivity(intent);
                     }
                 });
@@ -193,7 +190,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             String relativeDate = "";
             try {
                 long dateMillis = sf.parse(rawJsonDate).getTime();
-                // TODO change min to just m
                 relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
                         System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE).toString();
             } catch (ParseException e) {

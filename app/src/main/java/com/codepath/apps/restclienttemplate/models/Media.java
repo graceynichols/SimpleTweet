@@ -12,10 +12,8 @@ public class Media {
 
     private String mediaUrlHttps;
     private String type;
-    // TODO how should I save size?
     private int width;
     private int height;
-    //public JSONObject sizes;
 
     // Empty constructor for parcel library
     public Media() {}
@@ -26,10 +24,9 @@ public class Media {
         media.type = jsonObject.getString("type");
         if (jsonObject.has("sizes")) {
             // Get the image size;
-            media.width =  ((JSONObject) jsonObject.getJSONObject("sizes")).getJSONObject("medium").getInt("w");
-            media.height =  ((JSONObject) jsonObject.getJSONObject("sizes")).getJSONObject("medium").getInt("h");
+            media.width =  (jsonObject.getJSONObject("sizes")).getJSONObject("medium").getInt("w");
+            media.height =  (jsonObject.getJSONObject("sizes")).getJSONObject("medium").getInt("h");
         }
-        //media.sizes = jsonObject.getJSONObject("sizes");
         return media;
     }
 

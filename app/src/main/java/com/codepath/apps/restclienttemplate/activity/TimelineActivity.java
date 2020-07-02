@@ -19,9 +19,7 @@ import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TweetsAdapter;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
-import com.codepath.apps.restclienttemplate.activity.ComposeActivity;
 import com.codepath.apps.restclienttemplate.databinding.ActivityTimelineBinding;
-import com.codepath.apps.restclienttemplate.databinding.ActivityTweetDetailsBinding;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.models.TweetDao;
 import com.codepath.apps.restclienttemplate.models.TweetWithUser;
@@ -43,10 +41,10 @@ public class TimelineActivity extends AppCompatActivity {
     private static ActivityTimelineBinding binding;
     public static final int REQUEST_CODE = 20;
     private EndlessRecyclerViewScrollListener scrollListener;
+    private List<Tweet> tweets;
 
     TweetDao tweetDao;
     TwitterClient client;
-    private List<Tweet> tweets;
     TweetsAdapter adapter;
 
     @Override
@@ -60,6 +58,7 @@ public class TimelineActivity extends AppCompatActivity {
 
         tweetDao = ((TwitterApp) getApplicationContext()).getMyDatabase().tweetDao();
 
+        // Setup swipe to refresh
         binding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
@@ -75,6 +74,7 @@ public class TimelineActivity extends AppCompatActivity {
         // Init the list of tweets and adapter
         tweets = new ArrayList<>();
         adapter = new TweetsAdapter(this, tweets);
+
         // Recycler view setup: layout manager and the adapter
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.rvTweets.setLayoutManager(layoutManager);
