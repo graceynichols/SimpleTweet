@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
+import com.codepath.apps.restclienttemplate.databinding.ActivityTweetDetailsBinding;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -32,73 +33,50 @@ import okhttp3.Headers;
 
 public class TweetDetailsActivity extends AppCompatActivity {
     private static String TAG = "TweetDetailsActivity";
+    private static ActivityTweetDetailsBinding binding;
     TwitterClient client;
     Context context = this;
     Tweet tweet;
-    ImageView ivProfileImage;
-    TextView tvBody;
-    TextView tvScreenName;
-    TextView tvTime;
-    TextView tvName;
-    TextView favoriteCount;
-    TextView retweetCount;
     List<ImageView> imageViews;
-    ImageView image1;
-    ImageView image2;
-    ImageView image3;
-    ImageView image4;
-    ImageView retweet;
-    ImageView like;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tweet_details);
+        binding = ActivityTweetDetailsBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
 
         client = TwitterApp.getRestClient(this);
 
         tweet = (Tweet) Parcels.unwrap(getIntent().getParcelableExtra(Tweet.class.getSimpleName()));
-
-        ivProfileImage = findViewById(R.id.ivProfileImage);
-        tvBody = findViewById(R.id.tvBody);
-        tvScreenName = findViewById(R.id.tvScreenName);
-        tvName = findViewById(R.id.tvName);
-        tvTime = findViewById(R.id.tvTime);
-        favoriteCount = findViewById(R.id.favoriteCount);
-        retweetCount = findViewById(R.id.retweetCount);
-        retweet = findViewById(R.id.retweet);
-        like = findViewById(R.id.like);
-        image1 = findViewById(R.id.image1);
-        image2 = findViewById(R.id.image2);
-        image3 = findViewById(R.id.image3);
-        image4 = findViewById(R.id.image4);
         imageViews = new ArrayList<>();
-        imageViews.add(image1);
-        imageViews.add(image2);
-        imageViews.add(image3);
-        imageViews.add(image4);
+        imageViews.add(binding.image1);
+        imageViews.add(binding.image2);
+        imageViews.add(binding.image3);
+        imageViews.add(binding.image4);
 
         // Set all text information
         bindStats(tweet);
-        tvBody.setText(tweet.getBody());
+        binding.tvBody.setText(tweet.getBody());
         String username = this.getString(R.string.at) + tweet.getUser().getScreenName();
-        tvScreenName.setText(username);
-        tvTime.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
-        tvName.setText(tweet.getUser().getName());
+        binding.tvScreenName.setText(username);
+        binding.tvTime.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
+        binding.tvName.setText(tweet.getUser().getName());
 
         // Check if retweet/favorite icons need to be filled in
         if (tweet.isRetweeted()) {
-            retweet.setImageResource(R.drawable.ic_vector_retweet);
+            binding.retweet.setImageResource(R.drawable.ic_vector_retweet);
         }
         if (tweet.isFavorited()) {
-            like.setImageResource(R.drawable.ic_vector_heart);
+            binding.like.setImageResource(R.drawable.ic_vector_heart);
         }
 
         // Load profile pic
-        Glide.with(this).load(tweet.getUser().getProfileImageUrl()).circleCrop().into(ivProfileImage);
+        Glide.with(this).load(tweet.getUser().getProfileImageUrl()).circleCrop().into(binding.ivProfileImage);
 
         // Set on click listeners for retweet and favorite buttons
-        retweet.setOnClickListener(new View.OnClickListener() {
+        binding.retweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (tweet.isRetweeted()) {
@@ -107,9 +85,10 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "Unretweet successful");
                             // Make retweet bold and increase retweet count
-                            retweet.setImageResource(R.drawable.ic_vector_retweet_stroke);
+                            // TODO externalize repeated code
+                            binding.retweet.setImageResource(R.drawable.ic_vector_retweet_stroke);
                             tweet.subOneRetweet();
-                            retweetCount.setText("" + tweet.getRetweet_count());
+                            binding.retweetCount.setText("" + tweet.getRetweet_count());
                             tweet.toggleRetweeted();
                         }
 
@@ -124,9 +103,9 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "Retweet successful");
                             // Make retweet bold and increase retweet count
-                            retweet.setImageResource(R.drawable.ic_vector_retweet);
+                            binding.retweet.setImageResource(R.drawable.ic_vector_retweet);
                             tweet.addOneRetweet();
-                            retweetCount.setText("" + tweet.getRetweet_count());
+                            binding.retweetCount.setText("" + tweet.getRetweet_count());
                             tweet.toggleRetweeted();
                         }
 
@@ -140,7 +119,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
             }
         });
 
-        like.setOnClickListener(new View.OnClickListener() {
+        binding.like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (tweet.isFavorited()) {
@@ -149,9 +128,9 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "UnFavorite successful");
                             // Fill in heart button
-                            like.setImageResource(R.drawable.ic_vector_heart_stroke);
+                            binding.like.setImageResource(R.drawable.ic_vector_heart_stroke);
                             tweet.subOneFavorite();
-                            favoriteCount.setText("" + tweet.getFavorite_count());
+                            binding.favoriteCount.setText("" + tweet.getFavorite_count());
                             tweet.toggleFavorited();
                         }
 
@@ -166,9 +145,9 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "Favorite successful");
                             // Fill in heart button
-                            like.setImageResource(R.drawable.ic_vector_heart);
+                            binding.like.setImageResource(R.drawable.ic_vector_heart);
                             tweet.addOneFavorite();
-                            favoriteCount.setText("" + tweet.getFavorite_count());
+                            binding.favoriteCount.setText("" + tweet.getFavorite_count());
                             tweet.toggleFavorited();
                         }
 
@@ -187,7 +166,6 @@ public class TweetDetailsActivity extends AppCompatActivity {
         if (tweet.isExtendedEntitiesFlag()) {
             Log.i(TAG, "Tweet has extended entities");
             bindImages(tweet);
-            return;
         } else {
             for (int j = 0; j <= 3; j++) {
                 // Get rid of un needed imageViews
@@ -196,7 +174,6 @@ public class TweetDetailsActivity extends AppCompatActivity {
                 unusedView.getLayoutParams().width = 1;
                 unusedView.setVisibility(View.GONE);
             }
-            return;
         }
 
 
@@ -205,8 +182,8 @@ public class TweetDetailsActivity extends AppCompatActivity {
     // Bind the stats for the tweet
     public void bindStats(Tweet tweet) {
         // TODO replies
-        retweetCount.setText("" + tweet.getRetweet_count());
-        favoriteCount.setText("" + tweet.getFavorite_count());
+        binding.retweetCount.setText("" + tweet.getRetweet_count());
+        binding.favoriteCount.setText("" + tweet.getFavorite_count());
 
     }
 
@@ -232,7 +209,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
                     Log.i(TAG, "Image thumbnail clicked");
                     // Launch ImageActivity
                     Intent intent = new Intent(context, ImageActivity.class);
-                    // Serialize the movie using parceler
+                    // Serialize the media using parceler
                     intent.putExtra(Media.class.getSimpleName(), Parcels.wrap(tweetImage));
                     context.startActivity(intent);
 

@@ -9,18 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.activity.ImageActivity;
-import com.codepath.apps.restclienttemplate.activity.TimelineActivity;
 import com.codepath.apps.restclienttemplate.activity.TweetDetailsActivity;
+import com.codepath.apps.restclienttemplate.databinding.ItemTweetBinding;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
@@ -32,26 +28,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static androidx.core.app.ActivityCompat.startActivityForResult;
-
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>{
 
     private static String TAG = "TweetsAdapter";
     private static int REQUEST_CODE = 30;
-    Context context;
-    List<Tweet> tweets;
+    private int IMAGE_SIZE = 225;
+    private Context context;
+    private List<Tweet> tweets;
 
     public TweetsAdapter(Context context, List<Tweet> tweets) {
         this.context = context;
         this.tweets = tweets;
     }
 
-    // For each row, inflate the layout
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_tweet, parent, false);
-        return new ViewHolder(view);
+        // For each row, inflate the layout
+        LayoutInflater inflater = LayoutInflater.from(context);
+        ItemTweetBinding binding = ItemTweetBinding.inflate(inflater);
+        return new ViewHolder(binding);
     }
 
     // Bind values based on position of the element
@@ -83,42 +79,17 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
     // Define a viewholder
     public class ViewHolder extends RecyclerView.ViewHolder {
-
-        ImageView ivProfileImage;
-        TextView tvBody;
-        TextView tvScreenName;
-        TextView tvTime;
-        TextView tvName;
-        TextView favoriteCount;
-        TextView retweetCount;
         List<ImageView> imageViews;
-        ImageView image1;
-        ImageView image2;
-        ImageView image3;
-        ImageView image4;
-        ImageView retweet;
-        ImageView like;
+        ItemTweetBinding b;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
-            tvBody = itemView.findViewById(R.id.tvBody);
-            tvScreenName = itemView.findViewById(R.id.tvScreenName);
-            tvName = itemView.findViewById(R.id.tvName);
-            tvTime = itemView.findViewById(R.id.tvTime);
-            favoriteCount = itemView.findViewById(R.id.favoriteCount);
-            retweetCount = itemView.findViewById(R.id.retweetCount);
-            like = itemView.findViewById(R.id.like);
-            retweet = itemView.findViewById(R.id.retweet);
-            image1 = itemView.findViewById(R.id.image1);
-            image2 = itemView.findViewById(R.id.image2);
-            image3 = itemView.findViewById(R.id.image3);
-            image4 = itemView.findViewById(R.id.image4);
+        public ViewHolder(ItemTweetBinding binding) {
+            super(binding.getRoot());
+            b = binding;
             imageViews = new ArrayList<>();
-            imageViews.add(image1);
-            imageViews.add(image2);
-            imageViews.add(image3);
-            imageViews.add(image4);
+            imageViews.add(binding.image1);
+            imageViews.add(binding.image2);
+            imageViews.add(binding.image3);
+            imageViews.add(binding.image4);
 
         }
 
@@ -136,34 +107,39 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     // Serialize the tweet using parceler
                     intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
                     //context.startActivity(intent);
+                    //TODO store tweets in memory
                     ((Activity) context).startActivityForResult(intent, REQUEST_CODE);
 
                 }
             });
 
-            // Check if retweet/favorite icons need to be filled in
+            // Check if retweet/favorite icons need to be filled in or not
             if (tweet.isRetweeted()) {
-                retweet.setImageResource(R.drawable.ic_vector_retweet);
+                b.retweet.setImageResource(R.drawable.ic_vector_retweet);
+            } else {
+                b.retweet.setImageResource(R.drawable.ic_vector_retweet_stroke);
             }
             if (tweet.isFavorited()) {
-                like.setImageResource(R.drawable.ic_vector_heart);
+                b.like.setImageResource(R.drawable.ic_vector_heart);
+            } else {
+                b.like.setImageResource(R.drawable.ic_vector_heart_stroke);
             }
+
             // Set all text information
             bindStats(tweet);
-            tvBody.setText(tweet.getBody());
+            b.tvBody.setText(tweet.getBody());
             String username = context.getString(R.string.at) + tweet.getUser().getScreenName();
-            tvScreenName.setText(username);
-            tvTime.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
-            tvName.setText(tweet.getUser().getName());
+            b.tvScreenName.setText(username);
+            b.tvTime.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
+            b.tvName.setText(tweet.getUser().getName());
 
             // Load profile pic
-            Glide.with(context).load(tweet.getUser().getProfileImageUrl()).circleCrop().into(ivProfileImage);
+            Glide.with(context).load(tweet.getUser().getProfileImageUrl()).circleCrop().into(b.ivProfileImage);
 
             // Check if there are images to be added
             if (tweet.isExtendedEntitiesFlag()) {
                 Log.i(TAG, "Tweet has extended entities");
                 bindImages(tweet);
-                return;
             } else {
                 for (int j = 0; j <= 3; j++) {
                     // Get rid of un needed imageViews
@@ -172,17 +148,14 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     unusedView.getLayoutParams().width = 1;
                     unusedView.setVisibility(View.GONE);
                 }
-                return;
             }
         }
-
-
 
         // Bind the stats for the tweet
         public void bindStats(Tweet tweet) {
             // TODO replies
-            retweetCount.setText("" + tweet.getRetweet_count());
-            favoriteCount.setText("" + tweet.getFavorite_count());
+            b.retweetCount.setText("" + tweet.getRetweet_count());
+            b.favoriteCount.setText("" + tweet.getFavorite_count());
 
         }
 
@@ -192,12 +165,11 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             int i;
             for (i = 0; i < numImages; i++) {
                 ImageView imgView = imageViews.get(i);
+                imgView.setVisibility(View.VISIBLE);
                 final Media tweetImage = tweet.getExtendedEntities().getMediaList().get(i);
-                // TODO: probably should be cropped to thumbnail
-                //imgView.getLayoutParams().height = tweetImage.getHeight();
-                //imgView.getLayoutParams().width = tweetImage.getWidth();
-                imgView.getLayoutParams().height = 225;
-                imgView.getLayoutParams().width = 225;
+                // Load images in as clickable thumbnails
+                imgView.getLayoutParams().height = IMAGE_SIZE;
+                imgView.getLayoutParams().width = IMAGE_SIZE;
                 Glide.with(context).load(tweetImage.getMediaUrlHttps()).circleCrop()
                         .into(imgView);
                 // Attach on click listener to thumbnail
@@ -208,24 +180,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                         Log.i(TAG, "Image thumbnail clicked");
                         // Launch ImageActivity
                         Intent intent = new Intent(context, ImageActivity.class);
-                        // Serialize the movie using parceler
+                        // Serialize the media using parceler
                         intent.putExtra(Media.class.getSimpleName(), Parcels.wrap(tweetImage));
                         context.startActivity(intent);
-
                     }
                 });
 
             }
-            Log.d(TAG, "Unused Images " + i);
-            for (int j = i; j <= 3; j++) {
-                // Get rid of un needed imageViews
-                ImageView unusedView = imageViews.get(j);
-                unusedView.getLayoutParams().height = 1;
-                unusedView.getLayoutParams().width = 1;
-                unusedView.setVisibility(View.GONE);
-            }
-            return;
-
         }
 
         // Convert created_at time to relative time

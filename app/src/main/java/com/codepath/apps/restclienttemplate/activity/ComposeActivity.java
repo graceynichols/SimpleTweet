@@ -13,6 +13,8 @@ import android.widget.Toast;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
+import com.codepath.apps.restclienttemplate.databinding.ActivityComposeBinding;
+import com.codepath.apps.restclienttemplate.databinding.ActivityTweetDetailsBinding;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
@@ -23,29 +25,27 @@ import okhttp3.Headers;
 
 public class ComposeActivity extends AppCompatActivity {
 
+    private static ActivityComposeBinding binding;
     private final int MAX_TWEET_LENGTH = 280;
     private static final String TAG = "ComposeActivity";
-
-    EditText etCompose;
-    Button btnTweet;
 
     TwitterClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_compose);
+        binding = ActivityComposeBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+
 
         client = TwitterApp.getRestClient(this);
 
-        etCompose = findViewById(R.id.etCompose);
-        btnTweet = findViewById(R.id.btnTweet);
-
         // Set click listener on button
-        btnTweet.setOnClickListener(new View.OnClickListener() {
+        binding.btnTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String tweetContent = etCompose.getText().toString();
+                final String tweetContent = binding.etCompose.getText().toString();
                 if (tweetContent.isEmpty()) {
                     Toast.makeText(ComposeActivity.this, "Sorry, your tweet cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
@@ -56,7 +56,6 @@ public class ComposeActivity extends AppCompatActivity {
                 }
                 // Make an API call to Twitter to publish tweet
                 Log.d(TAG, "Valid tweet entered");
-                // TODO What should this say/ should it exist?
                 Toast.makeText(ComposeActivity.this, tweetContent, Toast.LENGTH_SHORT);
 
                 client.publishTweet(tweetContent, new JsonHttpResponseHandler() {
