@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.codepath.apps.restclienttemplate.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TweetsAdapter;
 import com.codepath.apps.restclienttemplate.TwitterApp;
@@ -37,6 +38,7 @@ public class TimelineActivity extends AppCompatActivity {
     private static final String TAG = "TimelineActivity";
     private static ActivityTimelineBinding binding;
     public static final int REQUEST_CODE = 20;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     TwitterClient client;
     private List<Tweet> tweets;
@@ -50,6 +52,7 @@ public class TimelineActivity extends AppCompatActivity {
         setContentView(view);
 
         client = TwitterApp.getRestClient(this);
+
 
         binding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -67,8 +70,20 @@ public class TimelineActivity extends AppCompatActivity {
         tweets = new ArrayList<>();
         adapter = new TweetsAdapter(this, tweets);
         // Recycler view setup: layout manager and the adapter
-        binding.rvTweets.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        binding.rvTweets.setLayoutManager(layoutManager);
         binding.rvTweets.setAdapter(adapter);
+
+        // Define scroll listener for infinite scroll
+        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.i(TAG, "onLoadMore: " + page);
+                loadMoreData();
+            }
+        };
+        // Add the scroll listener to the recycler view
+        binding.rvTweets.addOnScrollListener(scrollListener);
         populateHomeTimeline();
     }
 
@@ -111,6 +126,31 @@ public class TimelineActivity extends AppCompatActivity {
         }
         super.onActivityResult(requestCode, resultCode, data);
 
+    }
+
+    private void loadMoreData() {
+        // Send an API request to retrieve appropriate paginated data
+        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
+        client.getNextPageOfTweets(new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Log.i(TAG, "OnSuccess for loadMoreData" + json.toString());
+                //  --> Deserialize and construct new model objects from the API response
+                JSONArray jsonArray = json.jsonArray;
+                try {
+                    List<Tweet> tweets = Tweet.fromJsonArray(jsonArray);
+                    adapter.addAll(tweets);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //  --> Append the new data objects to the existing set of items inside the array of items
+                //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
+            }
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG, "OnFailure for loadMoreData");
+            }
+        }, tweets.get(tweets.size() - 1).getIdLong());
     }
 
     private void populateHomeTimeline() {
