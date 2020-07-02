@@ -34,6 +34,7 @@ import okhttp3.Headers;
 public class TweetDetailsActivity extends AppCompatActivity {
     private static String TAG = "TweetDetailsActivity";
     private static ActivityTweetDetailsBinding binding;
+    private int IMAGE_SIZE = 225;
     TwitterClient client;
     Context context = this;
     Tweet tweet;
@@ -149,6 +150,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
                             tweet.addOneFavorite();
                             binding.favoriteCount.setText("" + tweet.getFavorite_count());
                             tweet.toggleFavorited();
+
                         }
 
                         @Override
@@ -170,20 +172,17 @@ public class TweetDetailsActivity extends AppCompatActivity {
             for (int j = 0; j <= 3; j++) {
                 // Get rid of un needed imageViews
                 ImageView unusedView = imageViews.get(j);
-                unusedView.getLayoutParams().height = 1;
-                unusedView.getLayoutParams().width = 1;
                 unusedView.setVisibility(View.GONE);
             }
         }
-
-
     }
 
     // Bind the stats for the tweet
     public void bindStats(Tweet tweet) {
-        // TODO replies
-        binding.retweetCount.setText("" + tweet.getRetweet_count());
-        binding.favoriteCount.setText("" + tweet.getFavorite_count());
+        String retweets = "" + tweet.getRetweet_count();
+        String likes = "" + tweet.getFavorite_count();
+        binding.retweetCount.setText(retweets);
+        binding.favoriteCount.setText(likes);
 
     }
 
@@ -194,11 +193,9 @@ public class TweetDetailsActivity extends AppCompatActivity {
         for (i = 0; i < numImages; i++) {
             ImageView imgView = imageViews.get(i);
             final Media tweetImage = tweet.getExtendedEntities().getMediaList().get(i);
-            // TODO: probably should be cropped to thumbnail
-            //imgView.getLayoutParams().height = tweetImage.getHeight();
-            //imgView.getLayoutParams().width = tweetImage.getWidth();
-            imgView.getLayoutParams().height = 225;
-            imgView.getLayoutParams().width = 225;
+            imgView.setVisibility(View.VISIBLE);
+            imgView.getLayoutParams().height = IMAGE_SIZE;
+            imgView.getLayoutParams().width = IMAGE_SIZE;
             Glide.with(this).load(tweetImage.getMediaUrlHttps()).circleCrop()
                     .into(imgView);
             // Attach on click listener to thumbnail
@@ -217,16 +214,6 @@ public class TweetDetailsActivity extends AppCompatActivity {
             });
 
         }
-        Log.d(TAG, "Unused Images " + i);
-        for (int j = i; j <= 3; j++) {
-            // Get rid of un needed imageViews
-            ImageView unusedView = imageViews.get(j);
-            unusedView.getLayoutParams().height = 1;
-            unusedView.getLayoutParams().width = 1;
-            unusedView.setVisibility(View.GONE);
-        }
-        return;
-
     }
 
     // Convert created_at time to relative time

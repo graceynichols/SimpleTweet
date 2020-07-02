@@ -76,7 +76,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         notifyDataSetChanged();
     }
 
-
     // Define a viewholder
     public class ViewHolder extends RecyclerView.ViewHolder {
         List<ImageView> imageViews;
@@ -90,7 +89,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             imageViews.add(binding.image2);
             imageViews.add(binding.image3);
             imageViews.add(binding.image4);
-
         }
 
         public void bind(final Tweet tweet) {
@@ -144,8 +142,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 for (int j = 0; j <= 3; j++) {
                     // Get rid of un needed imageViews
                     ImageView unusedView = imageViews.get(j);
-                    unusedView.getLayoutParams().height = 1;
-                    unusedView.getLayoutParams().width = 1;
                     unusedView.setVisibility(View.GONE);
                 }
             }
@@ -153,10 +149,10 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         // Bind the stats for the tweet
         public void bindStats(Tweet tweet) {
-            // TODO replies
-            b.retweetCount.setText("" + tweet.getRetweet_count());
-            b.favoriteCount.setText("" + tweet.getFavorite_count());
-
+            String retweets = "" + tweet.getRetweet_count();
+            String likes = "" + tweet.getFavorite_count();
+            b.retweetCount.setText(retweets);
+            b.favoriteCount.setText(likes);
         }
 
         public void bindImages(Tweet tweet) {
@@ -185,7 +181,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                         context.startActivity(intent);
                     }
                 });
-
             }
         }
 

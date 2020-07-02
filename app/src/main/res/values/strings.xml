@@ -11,5 +11,6 @@
     <string name="at">\@</string>
     <string name="time">Time</string>
     <string name="screenname">Screenname</string>
+    <string name="emptysString" />
 
 </resources>

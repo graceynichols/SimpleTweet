@@ -47,16 +47,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/retweet"
         android:layout_alignParentStart="false"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentTop="false"
         android:layout_alignParentEnd="false"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="311dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="0dp"
         android:textColor="@android:color/tertiary_text_dark"
         tools:text="@string/time" />
 
     <ImageView
         android:id="@+id/image1"
+        android:visibility="gone"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_below="@+id/tvBody"
@@ -67,6 +68,7 @@
 
     <ImageView
         android:id="@+id/image2"
+        android:visibility="gone"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_below="@+id/tvBody"
@@ -78,6 +80,7 @@
 
     <ImageView
         android:id="@+id/image3"
+        android:visibility="gone"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_below="@+id/image1"
@@ -89,6 +92,7 @@
 
     <ImageView
         android:id="@+id/image4"
+        android:visibility="gone"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_below="@+id/image2"
