@@ -157,16 +157,16 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         public void bindImages(Tweet tweet) {
             Log.i(TAG, "Binding images");
-            int numImages = tweet.getExtendedEntities().getMediaList().size();
+            int numImages = tweet.getMediaUrlArray().size();
             int i;
             for (i = 0; i < numImages; i++) {
                 ImageView imgView = imageViews.get(i);
                 imgView.setVisibility(View.VISIBLE);
-                final Media tweetImage = tweet.getExtendedEntities().getMediaList().get(i);
+                final String tweetImage = tweet.getMediaUrlArray().get(i);
                 // Load images in as clickable thumbnails
                 imgView.getLayoutParams().height = IMAGE_SIZE;
                 imgView.getLayoutParams().width = IMAGE_SIZE;
-                Glide.with(context).load(tweetImage.getMediaUrlHttps()).circleCrop()
+                Glide.with(context).load(tweetImage).circleCrop()
                         .into(imgView);
                 // Attach on click listener to thumbnail
                 imgView.setOnClickListener(new View.OnClickListener() {

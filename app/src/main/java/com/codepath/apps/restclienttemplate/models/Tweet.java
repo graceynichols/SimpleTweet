@@ -2,28 +2,48 @@ package com.codepath.apps.restclienttemplate.models;
 
 import android.util.Log;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Parcel
+@Entity(foreignKeys = @ForeignKey(entity=User.class, parentColumns="id", childColumns="userId"))
 public class Tweet {
     private static String TAG = "Tweet";
-    private String body;
-    private String createdAt;
-    private User user;
-    private ExtendedEntities extendedEntities;
-    private int favorite_count;
-    private int retweet_count;
-    private String id;
+
+    @ColumnInfo
+    @PrimaryKey
     private long idLong;
-    //private int reply_count;
+    @ColumnInfo
+    private String body;
+    @ColumnInfo
+    private String createdAt;
+    @Ignore
+    private User user;
+    @ColumnInfo
+    private long userId;
+    @ColumnInfo
+    private int favorite_count;
+    @ColumnInfo
+    private int retweet_count;
+    @ColumnInfo
+    private String mediaUrlString;
+    @ColumnInfo
     private boolean extendedEntitiesFlag;
+    @ColumnInfo
     private boolean favorited;
+    @ColumnInfo
     private boolean retweeted;
 
     // Empty constructor for Parceler library
@@ -38,14 +58,14 @@ public class Tweet {
         tweet.retweet_count = jsonObject.getInt("retweet_count");
         tweet.favorited = jsonObject.getBoolean("favorited");
         tweet.retweeted = jsonObject.getBoolean("retweeted");
-        tweet.id = jsonObject.getString("id_str");
         tweet.idLong = jsonObject.getLong("id");
+        tweet.userId = tweet.user.getId();
         //tweet.reply_count = jsonObject.getInt("reply_count");
         if (jsonObject.has("extended_entities")) {
             // Tweet has native images to display
-            tweet.extendedEntities = ExtendedEntities.fromJson(jsonObject.getJSONObject("extended_entities"));
-            // TODO a flag probably isn't the best way to keep track of this
+            ExtendedEntities extendedEntities = ExtendedEntities.fromJson(jsonObject.getJSONObject("extended_entities"));
             tweet.extendedEntitiesFlag = true;
+            tweet.mediaUrlString = extendedEntities.getMediaUrlsString();
         } else {
             tweet.extendedEntitiesFlag = false;
         }
@@ -76,8 +96,8 @@ public class Tweet {
         return user;
     }
 
-    public ExtendedEntities getExtendedEntities() {
-        return extendedEntities;
+    public String getMediaUrlString() {
+        return mediaUrlString;
     }
 
     public boolean isExtendedEntitiesFlag() {
@@ -92,9 +112,6 @@ public class Tweet {
         return retweet_count;
     }
 
-    public String getId() {
-        return id;
-    }
 
     public int addOneRetweet() {
         retweet_count = retweet_count + 1;
@@ -124,16 +141,66 @@ public class Tweet {
         return retweeted;
     }
 
-    public void toggleFavorited() {
-        favorited = !favorited;
-    }
-
-    public void toggleRetweeted() {
-        retweeted = !retweeted;
-    }
 
     public long getIdLong() {
         return idLong;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setIdLong(long idLong) {
+        this.idLong = idLong;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+
+    public void setFavorite_count(int favorite_count) {
+        this.favorite_count = favorite_count;
+    }
+
+    public void setRetweet_count(int retweet_count) {
+        this.retweet_count = retweet_count;
+    }
+
+    public void setExtendedEntitiesFlag(boolean extendedEntitiesFlag) {
+        this.extendedEntitiesFlag = extendedEntitiesFlag;
+    }
+
+    public void setFavorited(boolean favorited) {
+        this.favorited = favorited;
+    }
+
+    public void setRetweeted(boolean retweeted) {
+        this.retweeted = retweeted;
+    }
+
+    public void setImageUrlsString(String imageUrlsString) {
+        this.mediaUrlString = imageUrlsString;
+    }
+
+    public List<String> getMediaUrlArray() {
+        return Arrays.asList(mediaUrlString.split(","));
+    }
+
+    public void setMediaUrlString(String mediaUrlString) {
+        this.mediaUrlString = mediaUrlString;
     }
 
     //public int getReply_count() {

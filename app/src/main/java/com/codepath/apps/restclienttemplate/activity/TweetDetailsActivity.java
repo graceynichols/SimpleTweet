@@ -17,6 +17,7 @@ import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.databinding.ActivityTweetDetailsBinding;
+import com.codepath.apps.restclienttemplate.models.ExtendedEntities;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -81,7 +82,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (tweet.isRetweeted()) {
-                    client.unRetweet(tweet.getId(), new JsonHttpResponseHandler() {
+                    client.unRetweet(tweet.getIdLong(), new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "Unretweet successful");
@@ -90,7 +91,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
                             binding.retweet.setImageResource(R.drawable.ic_vector_retweet_stroke);
                             tweet.subOneRetweet();
                             binding.retweetCount.setText("" + tweet.getRetweet_count());
-                            tweet.toggleRetweeted();
+                            tweet.setRetweeted(false);
                         }
 
                         @Override
@@ -99,7 +100,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    client.retweet(tweet.getId(), new JsonHttpResponseHandler() {
+                    client.retweet(tweet.getIdLong(), new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "Retweet successful");
@@ -107,7 +108,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
                             binding.retweet.setImageResource(R.drawable.ic_vector_retweet);
                             tweet.addOneRetweet();
                             binding.retweetCount.setText("" + tweet.getRetweet_count());
-                            tweet.toggleRetweeted();
+                            tweet.setRetweeted(true);;
                         }
 
                         @Override
@@ -124,7 +125,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (tweet.isFavorited()) {
-                    client.unFavorite(tweet.getId(), new JsonHttpResponseHandler() {
+                    client.unFavorite(tweet.getIdLong(), new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "UnFavorite successful");
@@ -132,7 +133,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
                             binding.like.setImageResource(R.drawable.ic_vector_heart_stroke);
                             tweet.subOneFavorite();
                             binding.favoriteCount.setText("" + tweet.getFavorite_count());
-                            tweet.toggleFavorited();
+                            tweet.setFavorited(false);
                         }
 
                         @Override
@@ -141,7 +142,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    client.favorite(tweet.getId(), new JsonHttpResponseHandler() {
+                    client.favorite(tweet.getIdLong(), new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "Favorite successful");
@@ -149,7 +150,7 @@ public class TweetDetailsActivity extends AppCompatActivity {
                             binding.like.setImageResource(R.drawable.ic_vector_heart);
                             tweet.addOneFavorite();
                             binding.favoriteCount.setText("" + tweet.getFavorite_count());
-                            tweet.toggleFavorited();
+                            tweet.setFavorited(true);
 
                         }
 
@@ -188,15 +189,15 @@ public class TweetDetailsActivity extends AppCompatActivity {
 
     public void bindImages(Tweet tweet) {
         Log.i(TAG, "Binding images");
-        int numImages = tweet.getExtendedEntities().getMediaList().size();
+        int numImages = tweet.getMediaUrlArray().size();
         int i;
         for (i = 0; i < numImages; i++) {
             ImageView imgView = imageViews.get(i);
-            final Media tweetImage = tweet.getExtendedEntities().getMediaList().get(i);
+            final String tweetImage = tweet.getMediaUrlArray().get(i);
             imgView.setVisibility(View.VISIBLE);
             imgView.getLayoutParams().height = IMAGE_SIZE;
             imgView.getLayoutParams().width = IMAGE_SIZE;
-            Glide.with(this).load(tweetImage.getMediaUrlHttps()).circleCrop()
+            Glide.with(this).load(tweetImage).circleCrop()
                     .into(imgView);
             // Attach on click listener to thumbnail
             imgView.setOnClickListener(new View.OnClickListener() {

@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Parcel
@@ -30,7 +31,6 @@ public class ExtendedEntities {
                 Media media = Media.fromJson((JSONObject) (mediaJson.get(i)));
                 Log.d(TAG, "Media Type: " + media.getType());
                 extendedEntities.mediaList.add(media);
-                // TODO only adds photos
                 /*
                 if (media.type.equals("photo")) {
                     extendedEntities.mediaList.add(media);
@@ -45,4 +45,24 @@ public class ExtendedEntities {
     public List<Media> getMediaList() {
         return mediaList;
     }
+
+    public List<String> getMediaUrls() {
+        List<String> urls = new ArrayList<>();
+        for (int i = 0; i < mediaList.size(); i++) {
+            urls.add(mediaList.get(i).getMediaUrlHttps());
+        }
+        return urls;
+    }
+
+    public String getMediaUrlsString() {
+        String urls = "";
+        for (int i = 0; i < mediaList.size(); i++) {
+            urls += (mediaList.get(i).getMediaUrlHttps());
+            if (i != mediaList.size() - 1) {
+                urls += ",";
+            }
+        }
+        return urls;
+    }
+
 }

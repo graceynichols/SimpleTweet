@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -22,6 +23,9 @@ import com.codepath.apps.restclienttemplate.activity.ComposeActivity;
 import com.codepath.apps.restclienttemplate.databinding.ActivityTimelineBinding;
 import com.codepath.apps.restclienttemplate.databinding.ActivityTweetDetailsBinding;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.TweetDao;
+import com.codepath.apps.restclienttemplate.models.TweetWithUser;
+import com.codepath.apps.restclienttemplate.models.User;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -40,6 +44,7 @@ public class TimelineActivity extends AppCompatActivity {
     public static final int REQUEST_CODE = 20;
     private EndlessRecyclerViewScrollListener scrollListener;
 
+    TweetDao tweetDao;
     TwitterClient client;
     private List<Tweet> tweets;
     TweetsAdapter adapter;
@@ -53,6 +58,7 @@ public class TimelineActivity extends AppCompatActivity {
 
         client = TwitterApp.getRestClient(this);
 
+        tweetDao = ((TwitterApp) getApplicationContext()).getMyDatabase().tweetDao();
 
         binding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -84,6 +90,19 @@ public class TimelineActivity extends AppCompatActivity {
         };
         // Add the scroll listener to the recycler view
         binding.rvTweets.addOnScrollListener(scrollListener);
+
+        // Query for existing tweets in the DB
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "Showing data from database");
+                List<TweetWithUser> tweetWithUsers = tweetDao.recentItems();
+                List<Tweet> tweetsFromDb = TweetWithUser.getTweetList(tweetWithUsers);
+                Log.i(TAG, "Got tweetwithuser");
+                adapter.clear();
+                adapter.addAll(tweetsFromDb);
+            }
+        });
         populateHomeTimeline();
     }
 
@@ -160,9 +179,21 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.i(TAG, "onSuccess,json: " + json.toString());
                 JSONArray jsonArray = json.jsonArray;
                 try {
+                    final List<Tweet> tweetsFromNetwork = Tweet.fromJsonArray(jsonArray);
                     adapter.clear();
-                    adapter.addAll(Tweet.fromJsonArray(jsonArray));
+                    adapter.addAll(tweetsFromNetwork);
                     binding.swipeContainer.setRefreshing(false);
+                    // Query for existing tweets in the DB
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i(TAG, "Saving data into database");
+                            List<User> usersFromNetwork = User.fromJsonTweetArray(tweetsFromNetwork);
+                            tweetDao.insertModel(usersFromNetwork.toArray(new User[0]));
+                            tweetDao.insertModel(tweetsFromNetwork.toArray(new Tweet[0]));
+                        }
+                    });
+
                     Log.i(TAG, "Tweets added");
                 } catch (JSONException e) {
                     Log.e(TAG, "Json Exception", e);
@@ -172,7 +203,7 @@ public class TimelineActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                Log.e(TAG, "onFailure", throwable);
+                Log.e(TAG, "onFailure for populate home timeline", throwable);
             }
         });
     }
