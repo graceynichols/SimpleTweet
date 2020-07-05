@@ -50,6 +50,8 @@ The following **additional** features are implemented:
 Here's a walkthrough of implemented user stories:
 
 ![Video Walkthrough](SimpleTweet.gif)
+Here's a walkthrough of the app being used offline!
+![Video Walkthrough](SimpleTweetOffline.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
